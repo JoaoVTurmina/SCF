@@ -1,0 +1,313 @@
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <time.h>
+#include <locale.h>
+
+#define MAX_USUARIOS 100
+#define MAX_FERRAMENTAS 100
+#define MAX_EMPRESTIMOS 100
+
+typedef struct {
+    char nome[100];
+    int cracha;
+    char telefone[20];
+    time_t dataCadastro;
+} Usuario;
+
+typedef struct {
+    char nome[100];
+    int numero;
+    char marca[100];
+    time_t dataCadastro;
+} Ferramenta;
+
+typedef struct {
+    int crachaUsuario;
+    int numeroFerramenta;
+    time_t dataEmprestimo;
+} Emprestimo;
+
+Usuario usuarios[MAX_USUARIOS];
+Ferramenta ferramentas[MAX_FERRAMENTAS];
+Emprestimo emprestimos[MAX_EMPRESTIMOS];
+int numUsuarios = 0;
+int numFerramentas = 0;
+int numEmprestimos = 0;
+
+void salvarRelatorio() {
+    FILE *arquivo = fopen("relatorio.txt", "w");
+    if (arquivo == NULL) {
+        printf("Erro ao abrir o arquivo.\n");
+        return;
+    }
+
+    // Escrever os usuários no arquivo
+    fprintf(arquivo, "===== USUÁRIOS CADASTRADOS =====\n");
+    for (int i = 0; i < numUsuarios; i++) {
+        fprintf(arquivo, "Nome: %s\n", usuarios[i].nome);
+        fprintf(arquivo, "Número do Crachá: %d\n", usuarios[i].cracha);
+        fprintf(arquivo, "Telefone: %s\n", usuarios[i].telefone);
+        fprintf(arquivo, "Data do Cadastro: %s", ctime(&usuarios[i].dataCadastro));
+        fprintf(arquivo, "\n");
+    }
+
+    // Escrever as ferramentas no arquivo
+    fprintf(arquivo, "===== FERRAMENTAS CADASTRADAS =====\n");
+    for (int i = 0; i < numFerramentas; i++) {
+        fprintf(arquivo, "Nome: %s\n", ferramentas[i].nome);
+        fprintf(arquivo, "Número: %d\n", ferramentas[i].numero);
+        fprintf(arquivo, "Marca: %s\n", ferramentas[i].marca);
+        fprintf(arquivo, "Data do Cadastro: %s", ctime(&ferramentas[i].dataCadastro));
+        fprintf(arquivo, "\n");
+    }
+
+    // Escrever os empréstimos no arquivo
+    fprintf(arquivo, "===== EMPRÉSTIMOS REALIZADOS =====\n");
+    for (int i = 0; i < numEmprestimos; i++) {
+        fprintf(arquivo, "Número do Crachá: %d\n", emprestimos[i].crachaUsuario);
+        fprintf(arquivo, "Número da Ferramenta: %d\n", emprestimos[i].numeroFerramenta);
+        fprintf(arquivo, "Data do Empréstimo: %s", ctime(&emprestimos[i].dataEmprestimo));
+        fprintf(arquivo, "\n");
+    }
+
+    fclose(arquivo);
+
+    printf("Relatório salvo com sucesso.\n");
+}
+
+void lerRelatorio() {
+    FILE *arquivo = fopen("relatorio.txt", "r");
+    if (arquivo == NULL) {
+        printf("Erro ao abrir o arquivo.\n");
+        return;
+    }
+
+    char linha[200];
+
+    while (fgets(linha, sizeof(linha), arquivo) != NULL) {
+        printf("%s", linha);
+    }
+
+    fclose(arquivo);
+}
+
+void cadastrarUsuario() {
+    Usuario novoUsuario;
+
+    printf("===== CADASTRO DE USUÁRIO =====\n");
+    printf("Nome: ");
+    scanf(" %[^\n]", novoUsuario.nome);
+    printf("Número do Crachá: ");
+    scanf("%d", &novoUsuario.cracha);
+    printf("Telefone: ");
+    scanf(" %[^\n]", novoUsuario.telefone);
+    novoUsuario.dataCadastro = time(NULL);
+
+    usuarios[numUsuarios++] = novoUsuario;
+
+    printf("Usuário cadastrado com sucesso.\n");
+}
+
+void cadastrarFerramenta() {
+    Ferramenta novaFerramenta;
+
+    printf("===== CADASTRO DE FERRAMENTA =====\n");
+    printf("Nome: ");
+    scanf(" %[^\n]", novaFerramenta.nome);
+    printf("Número: ");
+    scanf("%d", &novaFerramenta.numero);
+    printf("Marca: ");
+    scanf(" %[^\n]", novaFerramenta.marca);
+    novaFerramenta.dataCadastro = time(NULL);
+
+    ferramentas[numFerramentas++] = novaFerramenta;
+
+    printf("Ferramenta cadastrada com sucesso.\n");
+}
+
+void emprestarFerramenta() {
+    int crachaUsuario, numeroFerramenta;
+    int usuarioEncontrado = 0, ferramentaEncontrada = 0;
+
+    printf("===== EMPRÉSTIMO DE FERRAMENTA =====\n");
+    printf("Número do Crachá do Usuário: ");
+    scanf("%d", &crachaUsuario);
+    printf("Número da Ferramenta: ");
+    scanf("%d", &numeroFerramenta);
+
+    // Verificar se o usuário existe
+    for (int i = 0; i < numUsuarios; i++) {
+        if (usuarios[i].cracha == crachaUsuario) {
+            usuarioEncontrado = 1;
+            break;
+        }
+    }
+
+    if (!usuarioEncontrado) {
+        printf("Usuário não encontrado.\n");
+        return;
+    }
+
+    // Verificar se a ferramenta existe
+    for (int i = 0; i < numFerramentas; i++) {
+        if (ferramentas[i].numero == numeroFerramenta) {
+            ferramentaEncontrada = 1;
+            break;
+        }
+    }
+
+    if (!ferramentaEncontrada) {
+        printf("Ferramenta não encontrada.\n");
+        return;
+    }
+
+    // Verificar se a ferramenta já está emprestada
+    for (int i = 0; i < numEmprestimos; i++) {
+        if (emprestimos[i].numeroFerramenta == numeroFerramenta) {
+            printf("A ferramenta já está emprestada.\n");
+            return;
+        }
+    }
+
+    Emprestimo novoEmprestimo;
+    novoEmprestimo.crachaUsuario = crachaUsuario;
+    novoEmprestimo.numeroFerramenta = numeroFerramenta;
+    novoEmprestimo.dataEmprestimo = time(NULL);
+
+    emprestimos[numEmprestimos++] = novoEmprestimo;
+
+    printf("Ferramenta emprestada com sucesso.\n");
+}
+
+void devolverFerramenta() {
+    int numeroFerramenta;
+    int emprestimoEncontrado = 0;
+
+    printf("===== DEVOLUÇÃO DE FERRAMENTA =====\n");
+    printf("Número da Ferramenta: ");
+    scanf("%d", &numeroFerramenta);
+
+    for (int i = 0; i < numEmprestimos; i++) {
+        if (emprestimos[i].numeroFerramenta == numeroFerramenta) {
+            emprestimoEncontrado = 1;
+            for (int j = i; j < numEmprestimos - 1; j++) {
+                emprestimos[j] = emprestimos[j + 1];
+            }
+            numEmprestimos--;
+            break;
+        }
+    }
+
+    if (emprestimoEncontrado) {
+        printf("Ferramenta devolvida com sucesso.\n");
+    } else {
+        printf("Ferramenta não está emprestada.\n");
+    }
+}
+
+void exibirMenu() {
+        printf("\n");
+        printf("=======================================\n");
+        printf("|         SISTEMA DE EMPRÉSTIMO        |\n");
+        printf("|           DE FERRAMENTAS             |\n");
+        printf("========================================\n");
+        printf("|                                      |\n");
+        printf("| 1 - Cadastrar Usuário                |\n");
+        printf("| 2 - Cadastrar Ferramenta             |\n");
+        printf("| 3 - Emprestar Ferramentas            |\n");
+        printf("| 4 - Devolver Ferramentas             |\n");
+        printf("| 5 - Salvar Relatório                 |\n");
+        printf("| 6 - Ler Relatório                    |\n");
+        printf("| 0 - Sair                             |\n");
+        printf("|                                      |\n");
+        printf("========================================\n");
+    printf("Opção: ");
+}
+
+int main() {
+    setlocale(LC_ALL, "Portuguese");
+
+    int opcao;
+
+    do {
+        exibirMenu();
+        scanf("%d", &opcao);
+
+        switch (opcao) {
+            case 1:
+                cadastrarUsuario();
+                break;
+            case 2:
+                cadastrarFerramenta();
+                break;
+            case 3:
+                emprestarFerramenta();
+                break;
+            case 4:
+                devolverFerramenta();
+                break;
+            case 5:
+                salvarRelatorio();
+                break;
+            case 6:
+                lerRelatorio();
+                break;
+            case 0:
+                printf("Saindo do programa...\n");
+                break;
+            default:
+                printf("Opção inválida.\n");
+                break;
+        }
+
+    } while (opcao != 0);
+
+    return 0;
+}
+
+
+/*
+
+int main() {
+    setlocale(LC_ALL, "Portuguese");
+
+    int opcao;
+
+    do {
+
+        printf("Digite a opção desejada: ");
+        scanf("%d", &opcao);
+
+        switch (opcao) {
+            case 1:
+                cadastrarUsuario();
+                break;
+            case 2:
+                cadastrarFerramenta();
+                break;
+            case 3:
+                exibirUsuarios();
+                break;
+            case 4:
+                exibirFerramentas();
+                break;
+            case 5:
+                salvarRelatorio();
+                break;
+            case 6:
+                lerRelatorio();
+                break;
+            case 0:
+                printf("Encerrando o programa...\n");
+                break;
+            default:
+                printf("Opção inválida. Tente novamente.\n");
+                break;
+        }
+
+    } while (opcao != 0);
+
+    return 0;
+} */

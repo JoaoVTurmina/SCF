@@ -1,0 +1,17 @@
+===== USUÁRIOS CADASTRADOS =====
+Nome: Joao
+Número do Crachá: 21001001
+Telefone: 45999123456
+Data do Cadastro: Thu Jun 29 21:19:44 2023
+
+===== FERRAMENTAS CADASTRADAS =====
+Nome: Alicate Universal
+Número: 2023001
+Marca: Gedore
+Data do Cadastro: Thu Jun 29 21:20:14 2023
+
+===== EMPRÉSTIMOS EM ABERTO =====
+Número do Crachá: 21001001
+Número da Ferramenta: 2023001
+Data do Empréstimo: Thu Jun 29 21:20:31 2023
+

@@ -1,0 +1,15 @@
+# depslib dependency file v1.0
+1687918489 source:c:\users\joao_\desktop\biopark\1º período\desenvolvimento desktop\projetos\sistema de controle de ferramentas\scf_(05)\main.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<time.h>
+	<locale.h>
+
+1688076503 source:c:\users\joao_\desktop\scf_(05)\main.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<time.h>
+	<locale.h>
+
